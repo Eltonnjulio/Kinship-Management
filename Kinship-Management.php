@@ -18,7 +18,9 @@ if (!defined('ABSPATH')){
 
     public function __construct()
     {
-        add_action( 'init', array($this,'create_manage_kinships') );
+        // add_action( 'init', array($this,'create_manage_kinships') );
+
+        add_action( 'admin_menu', array($this, 'add_admin_pages') );
     }
     
     function create_manage_kinships() {
@@ -68,17 +70,6 @@ if (!defined('ABSPATH')){
 
         $kinship_details = $wpdb->prefix.'people_kinships';
 
-        // $kinship_det = "CREATE TABLE IF NOT EXISTS" .$kinship_details."(
-        //     id int AUTO_INCREMENT primary key,
-        //     kinship_name text not null,
-        //     kinship_owner int not null,
-        //     kinship int not null,
-        //     status int CHECK(status in 0,1),
-        //     constraint fk_kinship_owner (kinship_owner) REFERENCES people_details(id),
-        //     constraint fk_kinship (kinship) REFERENCES people_details(id),
-        //     constraint ck_kinship_name CHECK (kinship_name in 'mother','father','son','daughter','brother','sister')
-
-        // ) $charset;";
         $people_details = $wpdb->prefix.'people_details';
 
         $sql = "CREATE TABLE `$kinship_details` (
@@ -101,10 +92,50 @@ if (!defined('ABSPATH')){
 
      function createTables(){
         
-        // $this->create_peopleTable();
+        $this->create_peopleTable();
         $this->create_kinshipTable();
     }
     
+    function add_admin_pages(){
+
+        add_menu_page( 'People List', 'kinship', 'manage_options', 'Kinship Management', array($this,'admin_index'),'dashicons-store',110);
+        
+    }
+
+    public function admin_index(){
+
+        require_once plugin_dir_path( __FILE__ ).'views/admin_index.php';
+
+    }
+
+    public function create_people(){
+
+        require_once plugin_dir_path( __FILE__ ).'views/create_people.php';
+
+    }
+
+    function insert_people(){
+
+        $name = $_POST['name'];
+        $age = $_POST['age'];
+
+        global $wpdb;
+
+        $people_details = $wpdb->prefix.'people_details';
+
+        $wpdb->insert(
+            $people_details,
+            [
+                'name' => $name,
+                'age' => $age  
+
+            ]
+
+        );
+
+
+    }
+
     public function activate(){
         $this->createTables();
     
@@ -131,7 +162,7 @@ if (!defined('ABSPATH')){
     
         register_activation_hook(__FILE__, array($plugin, 'activate'));
         register_deactivation_hook(__FILE__, array($plugin, 'deactivate'));
-        // register_uninstall_hook(__FILE__, array($plugin, 'uninstall'));
+        register_uninstall_hook(__FILE__, array($plugin, 'uninstall'));
     
     
         }
