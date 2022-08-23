@@ -42,29 +42,24 @@ if (!defined('ABSPATH')){
     }
     
      function create_peopleTable(){
+       
         global $wpdb;
 
         $people_details = $wpdb->prefix.'people_details';
-        $charset = $wpdb->get_charset_collate;
 
-        $people_det = "CREATE TABLE IF NOT EXISTS" .$people_details."(
-            id int AUTO_INCREMENT primary key,
-            name text not null,
-            avatar text not null,
-            age int not null,
-            status int CHECK(status in 0,1),
-            constraint CKT_name_size check ( LENGTH(name) > 5 ),
-            constraint CKT_age check ( age>0 ),
-            UNIQUE KEY thekey (name,age)
+        $sql = "CREATE TABLE `$people_details` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `name` varchar(30) CHARACTER SET latin1 NOT NULL check ( LENGTH(`name`) > 5 ),
+            `avatar` varchar(15) NULL,
+            `age` int(11) NOT NULL check ( `age`>0 ),
+            `status` varchar(15) NULL,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY thekey (`name`,`age`)
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
-        )$charset;";
-
-            require_once(ABSPATH.'wp-admin/includes/upgrade.php');
-
-          dbDelta($people_det);
-
-        //   return var_dump(dbDelta($people_det))
-
+        require_once(ABSPATH.'wp-admin/includes/upgrade.php');
+            
+          dbDelta($sql);
     }
 
      function create_kinshipTable(){
@@ -72,37 +67,45 @@ if (!defined('ABSPATH')){
         global $wpdb;
 
         $kinship_details = $wpdb->prefix.'people_kinships';
-        $charset = $wpdb->get_charset_collate;
 
-        $kinship_det = "CREATE TABLE IF NOT EXISTS" .$kinship_details."(
-            id int AUTO_INCREMENT primary key,
-            kinship_name text not null,
-            kinship_owner int not null,
-            kinship int not null,
-            status int CHECK(status in 0,1),
-            constraint fk_kinship_owner (kinship_owner) REFERENCES people_details(id),
-            constraint fk_kinship (kinship) REFERENCES people_details(id),
-            constraint ck_kinship_name CHECK (kinship_name in 'mother','father','son','daughter','brother','sister')
+        // $kinship_det = "CREATE TABLE IF NOT EXISTS" .$kinship_details."(
+        //     id int AUTO_INCREMENT primary key,
+        //     kinship_name text not null,
+        //     kinship_owner int not null,
+        //     kinship int not null,
+        //     status int CHECK(status in 0,1),
+        //     constraint fk_kinship_owner (kinship_owner) REFERENCES people_details(id),
+        //     constraint fk_kinship (kinship) REFERENCES people_details(id),
+        //     constraint ck_kinship_name CHECK (kinship_name in 'mother','father','son','daughter','brother','sister')
 
-        ) $charset;";
+        // ) $charset;";
+        $people_details = $wpdb->prefix.'people_details';
+
+        $sql = "CREATE TABLE `$kinship_details` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `kinship_name` varchar(30) CHARACTER SET latin1 NOT NULL,
+            `kinship_owner` int(11) NOT NULL,
+            `kinship` int(11) NOT NULL,
+            `status` varchar(15) NULL,
+            PRIMARY KEY (`id`),
+            FOREIGN KEY (`kinship_owner`) REFERENCES `$people_details`(`id`),
+            FOREIGN KEY (`kinship`) REFERENCES `$people_details`(`id`)
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
         require_once(ABSPATH.'wp-admin/includes/upgrade.php');
-
-        //  var_dump(dbDelta($kinship_det));
-
-        dbDelta($kinship_det);
+            
+          dbDelta($sql);
 
     }
 
 
      function createTables(){
         
-        $this->create_peopleTable();
+        // $this->create_peopleTable();
         $this->create_kinshipTable();
     }
     
     public function activate(){
-        $this->Create_manage_kinships();
         $this->createTables();
     
         flush_rewrite_rules();
@@ -128,7 +131,7 @@ if (!defined('ABSPATH')){
     
         register_activation_hook(__FILE__, array($plugin, 'activate'));
         register_deactivation_hook(__FILE__, array($plugin, 'deactivate'));
-        register_uninstall_hook(__FILE__, array($plugin, 'uninstall'));
+        // register_uninstall_hook(__FILE__, array($plugin, 'uninstall'));
     
     
         }
