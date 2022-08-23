@@ -1,14 +1,14 @@
 <?php
 /**
  *   Plugin Name: Kinship Management
- *   Plugin URI: https://github.com/nmupoia/Kinship-Management
+ *   Plugin URI: https://github.com/eltonnjulio/Kinship-Management
  *   Description: A Wordpress plugin to manage people and kinships
  *   Version: 0.1.0
  *   Author: Elton Julio
  *   Author URI: https://github.com/eltonnjulio
  */
 
-class Plugin {
+ class Manage_kinships {
 
 
     public function __construct()
@@ -62,7 +62,7 @@ class Plugin {
     
     if( class_exists('Plugin') ){
     
-        $plugin = new Plugin();
+        $plugin = new Manage_kinships();
     
         register_activation_hook(__FILE__, array($plugin, 'activate'));
         register_deactivation_hook(__FILE__, array($plugin, 'deactivate'));
